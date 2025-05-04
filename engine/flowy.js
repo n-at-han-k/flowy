@@ -281,107 +281,139 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
         }
 
         function snap(drag, i, blocko) {
+            // If not rearranging, append the dragged block to the canvas
             if (!rearrange) {
-                canvas_div.appendChild(drag);
+            canvas_div.appendChild(drag);
             }
-            var totalwidth = 0;
-            var totalremove = 0;
-            var maxheight = 0;
+
+            var totalwidth = 0; // Total width of all child blocks
+            var totalremove = 0; // Tracks the cumulative width removed for alignment
+            var maxheight = 0; // Tracks the maximum height of child blocks (not used here but could be extended)
+
+            // Calculate the total width of all child blocks of the parent block
             for (var w = 0; w < blocks.filter(id => id.parent == blocko[i]).length; w++) {
-                var children = blocks.filter(id => id.parent == blocko[i])[w];
-                if (children.childwidth > children.width) {
-                    totalwidth += children.childwidth + paddingx;
-                } else {
-                    totalwidth += children.width + paddingx;
-                }
+            var children = blocks.filter(id => id.parent == blocko[i])[w];
+            if (children.childwidth > children.width) {
+                totalwidth += children.childwidth + paddingx; // Add child width + padding
+            } else {
+                totalwidth += children.width + paddingx; // Add block width + padding
             }
+            }
+
+            // Add the width of the dragged block to the total width
             totalwidth += parseInt(window.getComputedStyle(drag).width);
+
+            // Align child blocks under the parent block
             for (var w = 0; w < blocks.filter(id => id.parent == blocko[i]).length; w++) {
-                var children = blocks.filter(id => id.parent == blocko[i])[w];
-                if (children.childwidth > children.width) {
-                    document.querySelector(".blockid[value='" + children.id + "']").parentNode.style.left = blocks.filter(a => a.id == blocko[i])[0].x - (totalwidth / 2) + totalremove + (children.childwidth / 2) - (children.width / 2) + "px";
-                    children.x = blocks.filter(id => id.parent == blocko[i])[0].x - (totalwidth / 2) + totalremove + (children.childwidth / 2);
-                    totalremove += children.childwidth + paddingx;
-                } else {
-                    document.querySelector(".blockid[value='" + children.id + "']").parentNode.style.left = blocks.filter(a => a.id == blocko[i])[0].x - (totalwidth / 2) + totalremove + "px";
-                    children.x = blocks.filter(id => id.parent == blocko[i])[0].x - (totalwidth / 2) + totalremove + (children.width / 2);
-                    totalremove += children.width + paddingx;
-                }
+            var children = blocks.filter(id => id.parent == blocko[i])[w];
+            if (children.childwidth > children.width) {
+                // Position the child block based on its child width
+                document.querySelector(".blockid[value='" + children.id + "']").parentNode.style.left = blocks.filter(a => a.id == blocko[i])[0].x - (totalwidth / 2) + totalremove + (children.childwidth / 2) - (children.width / 2) + "px";
+                children.x = blocks.filter(id => id.parent == blocko[i])[0].x - (totalwidth / 2) + totalremove + (children.childwidth / 2);
+                totalremove += children.childwidth + paddingx; // Update the cumulative width
+            } else {
+                // Position the child block based on its block width
+                document.querySelector(".blockid[value='" + children.id + "']").parentNode.style.left = blocks.filter(a => a.id == blocko[i])[0].x - (totalwidth / 2) + totalremove + "px";
+                children.x = blocks.filter(id => id.parent == blocko[i])[0].x - (totalwidth / 2) + totalremove + (children.width / 2);
+                totalremove += children.width + paddingx; // Update the cumulative width
             }
+            }
+
+            // Position the dragged block under the parent block
             drag.style.left = blocks.filter(id => id.id == blocko[i])[0].x - (totalwidth / 2) + totalremove - (window.scrollX + absx) + canvas_div.scrollLeft + canvas_div.getBoundingClientRect().left + "px";
             drag.style.top = blocks.filter(id => id.id == blocko[i])[0].y + (blocks.filter(id => id.id == blocko[i])[0].height / 2) + paddingy - (window.scrollY + absy) + canvas_div.getBoundingClientRect().top + "px";
-            if (rearrange) {
-                blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value))[0].x = (drag.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left;
-                blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value))[0].y = (drag.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(drag).height) / 2) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top;
-                blockstemp.filter(a => a.id == drag.querySelector(".blockid").value)[0].parent = blocko[i];
-                for (var w = 0; w < blockstemp.length; w++) {
-                    if (blockstemp[w].id != parseInt(drag.querySelector(".blockid").value)) {
-                        const blockParent = document.querySelector(".blockid[value='" + blockstemp[w].id + "']").parentNode;
-                        const arrowParent = document.querySelector(".arrowid[value='" + blockstemp[w].id + "']").parentNode;
-                        blockParent.style.left = (blockParent.getBoundingClientRect().left + window.scrollX) - (window.scrollX + canvas_div.getBoundingClientRect().left) + canvas_div.scrollLeft + "px";
-                        blockParent.style.top = (blockParent.getBoundingClientRect().top + window.scrollY) - (window.scrollY + canvas_div.getBoundingClientRect().top) + canvas_div.scrollTop + "px";
-                        arrowParent.style.left = (arrowParent.getBoundingClientRect().left + window.scrollX) - (window.scrollX + canvas_div.getBoundingClientRect().left) + canvas_div.scrollLeft + 20 + "px";
-                        arrowParent.style.top = (arrowParent.getBoundingClientRect().top + window.scrollY) - (window.scrollY + canvas_div.getBoundingClientRect().top) + canvas_div.scrollTop + "px";
-                        canvas_div.appendChild(blockParent);
-                        canvas_div.appendChild(arrowParent);
 
-                        blockstemp[w].x = (blockParent.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(blockParent).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left;
-                        blockstemp[w].y = (blockParent.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(blockParent).height) / 2) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top;
-                    }
+            if (rearrange) {
+            // Update the temporary block's position and parent
+            blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value))[0].x = (drag.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left;
+            blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value))[0].y = (drag.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(drag).height) / 2) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top;
+            blockstemp.filter(a => a.id == drag.querySelector(".blockid").value)[0].parent = blocko[i];
+
+            // Reposition all temporary blocks and arrows
+            for (var w = 0; w < blockstemp.length; w++) {
+                if (blockstemp[w].id != parseInt(drag.querySelector(".blockid").value)) {
+                const blockParent = document.querySelector(".blockid[value='" + blockstemp[w].id + "']").parentNode;
+                const arrowParent = document.querySelector(".arrowid[value='" + blockstemp[w].id + "']").parentNode;
+
+                // Adjust the block's position
+                blockParent.style.left = (blockParent.getBoundingClientRect().left + window.scrollX) - (window.scrollX + canvas_div.getBoundingClientRect().left) + canvas_div.scrollLeft + "px";
+                blockParent.style.top = (blockParent.getBoundingClientRect().top + window.scrollY) - (window.scrollY + canvas_div.getBoundingClientRect().top) + canvas_div.scrollTop + "px";
+
+                // Adjust the arrow's position
+                arrowParent.style.left = (arrowParent.getBoundingClientRect().left + window.scrollX) - (window.scrollX + canvas_div.getBoundingClientRect().left) + canvas_div.scrollLeft + 20 + "px";
+                arrowParent.style.top = (arrowParent.getBoundingClientRect().top + window.scrollY) - (window.scrollY + canvas_div.getBoundingClientRect().top) + canvas_div.scrollTop + "px";
+
+                // Append the block and arrow back to the canvas
+                canvas_div.appendChild(blockParent);
+                canvas_div.appendChild(arrowParent);
+
+                // Update the block's position in the temporary array
+                blockstemp[w].x = (blockParent.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(blockParent).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left;
+                blockstemp[w].y = (blockParent.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(blockParent).height) / 2) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top;
                 }
-                blocks = blocks.concat(blockstemp);
-                blockstemp = [];
-            } else {
-                blocks.push({
-                    childwidth: 0,
-                    parent: blocko[i],
-                    id: parseInt(drag.querySelector(".blockid").value),
-                    x: (drag.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left,
-                    y: (drag.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(drag).height) / 2) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top,
-                    width: parseInt(window.getComputedStyle(drag).width),
-                    height: parseInt(window.getComputedStyle(drag).height)
-                });
             }
-            
+
+            // Merge temporary blocks into the main blocks array
+            blocks = blocks.concat(blockstemp);
+            blockstemp = [];
+            } else {
+            // Add the dragged block to the blocks array
+            blocks.push({
+                childwidth: 0,
+                parent: blocko[i],
+                id: parseInt(drag.querySelector(".blockid").value),
+                x: (drag.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left,
+                y: (drag.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(drag).height) / 2) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top,
+                width: parseInt(window.getComputedStyle(drag).width),
+                height: parseInt(window.getComputedStyle(drag).height)
+            });
+            }
+
+            // Draw an arrow connecting the dragged block to its parent
             var arrowblock = blocks.filter(a => a.id == parseInt(drag.querySelector(".blockid").value))[0];
             var arrowx = arrowblock.x - blocks.filter(a => a.id == blocko[i])[0].x + 20;
             var arrowy = paddingy;
             drawArrow(arrowblock, arrowx, arrowy, blocko[i]);
-            
+
+            // Update the child width of all ancestor blocks
             if (blocks.filter(a => a.id == blocko[i])[0].parent != -1) {
-                var flag = false;
-                var idval = blocko[i];
-                while (!flag) {
-                    if (blocks.filter(a => a.id == idval)[0].parent == -1) {
-                        flag = true;
+            var flag = false;
+            var idval = blocko[i];
+            while (!flag) {
+                if (blocks.filter(a => a.id == idval)[0].parent == -1) {
+                flag = true;
+                } else {
+                var zwidth = 0;
+                for (var w = 0; w < blocks.filter(id => id.parent == idval).length; w++) {
+                    var children = blocks.filter(id => id.parent == idval)[w];
+                    if (children.childwidth > children.width) {
+                    if (w == blocks.filter(id => id.parent == idval).length - 1) {
+                        zwidth += children.childwidth;
                     } else {
-                        var zwidth = 0;
-                        for (var w = 0; w < blocks.filter(id => id.parent == idval).length; w++) {
-                            var children = blocks.filter(id => id.parent == idval)[w];
-                            if (children.childwidth > children.width) {
-                                if (w == blocks.filter(id => id.parent == idval).length - 1) {
-                                    zwidth += children.childwidth;
-                                } else {
-                                    zwidth += children.childwidth + paddingx;
-                                }
-                            } else {
-                                if (w == blocks.filter(id => id.parent == idval).length - 1) {
-                                    zwidth += children.width;
-                                } else {
-                                    zwidth += children.width + paddingx;
-                                }
-                            }
-                        }
-                        blocks.filter(a => a.id == idval)[0].childwidth = zwidth;
-                        idval = blocks.filter(a => a.id == idval)[0].parent;
+                        zwidth += children.childwidth + paddingx;
+                    }
+                    } else {
+                    if (w == blocks.filter(id => id.parent == idval).length - 1) {
+                        zwidth += children.width;
+                    } else {
+                        zwidth += children.width + paddingx;
+                    }
                     }
                 }
-                blocks.filter(id => id.id == idval)[0].childwidth = totalwidth;
+                blocks.filter(a => a.id == idval)[0].childwidth = zwidth;
+                idval = blocks.filter(a => a.id == idval)[0].parent;
+                }
             }
+            blocks.filter(id => id.id == idval)[0].childwidth = totalwidth;
+            }
+
+            // Finalize rearrangement if applicable
             if (rearrange) {
-                rearrange = false;
-                drag.classList.remove("dragging");
+            rearrange = false;
+            drag.classList.remove("dragging");
             }
+
+            // Rearrange all blocks and check for canvas offset
             rearrangeMe();
             checkOffset();
         }
