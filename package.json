@@ -1,5 +1,5 @@
 {
-  "name": "js-playground",
+  "name": "flowy",
   "scripts": {
     "dev": "npm-run-all --parallel dev:server dev:css",
     "dev:server": "nodemon --exec bin/dev",

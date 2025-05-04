@@ -1,12 +1,41 @@
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none; /* Safari */
+  -khtml-user-select: none; /* Konqueror HTML */
+  -moz-user-select: none; /* Old versions of Firefox */
+  -ms-user-select: none; /* Internet Explorer/Edge */
+  user-select: none; /* Non-prefixed version, currently
+   supported by Chrome, Opera and Firefox */
+}
+
 body, html {
   margin: 0px;
   padding: 0px;
   overflow: hidden;
-  background-image: url(assets/tile.png);
+  background-image: url(/assets/tile.png);
   background-repeat: repeat;
   background-size: 30px 30px;
   background-color: #FBFBFB;
   height: 100%;
+}
+
+.tpf-flowchart__canvas {
+  position: absolute;
+  width: calc(100% - 361px);
+  height: calc(100% - 71px);
+  top: 71px;
+  left: 361px;
+  z-index: 0;
+  overflow: auto;
+}
+.tpf-flowchart__block {
+  background-color: #FFF;
+  margin-top: 0px !important;
+  box-shadow: 0px 4px 30px rgba(22, 33, 74, 0.05);
+}
+.tpf-flowchart__block--selected {
+  border: 2px solid #217CE8;
+  box-shadow: 0px 4px 30px rgba(22, 33, 74, 0.08);
 }
 
 #navigation {
@@ -624,16 +653,6 @@ body, html {
   opacity: 0.5;
 }
 
-.noselect {
-  -webkit-touch-callout: none; /* iOS Safari */
-  -webkit-user-select: none; /* Safari */
-  -khtml-user-select: none; /* Konqueror HTML */
-  -moz-user-select: none; /* Old versions of Firefox */
-  -ms-user-select: none; /* Internet Explorer/Edge */
-  user-select: none; /* Non-prefixed version, currently
-   supported by Chrome, Opera and Firefox */
-}
-
 .blockyname {
   font-family: Roboto;
   font-weight: 500;
@@ -700,17 +719,6 @@ body, html {
   border-bottom: 1px solid #D3DCEA;
   line-height: 20px;
   text-indent: 0px;
-}
-
-.block {
-  background-color: #FFF;
-  margin-top: 0px !important;
-  box-shadow: 0px 4px 30px rgba(22, 33, 74, 0.05);
-}
-
-.selectedblock {
-  border: 2px solid #217CE8;
-  box-shadow: 0px 4px 30px rgba(22, 33, 74, 0.08);
 }
 
 @media only screen and (max-width: 832px) {

@@ -1,26 +1,15 @@
+import Block from './block.js';
+import Canvas from './canvas.js';
+
 var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spacing_y) {
-    if (!grab) {
-        grab = function() {};
-    }
-    if (!release) {
-        release = function() {};
-    }
-    if (!snapping) {
-        snapping = function() {
-            return true;
-        }
-    }
-    if (!rearrange) {
-        rearrange = function() {
-            return false;
-        }
-    }
-    if (!spacing_x) {
-        spacing_x = 20;
-    }
-    if (!spacing_y) {
-        spacing_y = 80;
-    }
+    // Initialize default callback functions
+    if (!grab) grab = function() {};
+    if (!release) release = function() {};
+    if (!snapping) snapping = function() { return true; };
+    if (!rearrange) rearrange = function() { return false; };
+
+    if (!spacing_x) { spacing_x = 20 }
+    if (!spacing_y) { spacing_y = 80 }
 
     var loaded = false;
     flowy.load = function() {
@@ -870,7 +859,7 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
 
     /**
      * Removes an event listener from multiple elements matching a selector.
-     * This function is used to detach event listener from dynamically created elements.
+     * This function is used to detach event listeners from dynamically created elements.
      * 
      * @param {string} type - The event type (e.g., "click").
      * @param {Function} listener - The event listener function.

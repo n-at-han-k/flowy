@@ -1,15 +1,24 @@
-import FlowChart from "./FlowChart.js"
+//import FlowChart from "./FlowChart.js"
+import FlowChartController from "./FlowChartController.js"
+import CanvasController from "./CanvasController.js"
+import BlockController from "./BlockController.js"
 
-const canvasDiv = document.getElementById("canvas");
+export {
+  FlowChartController,
+  CanvasController,
+  BlockController,
+}
 
-const options = {
-  nodeWidth: 120,
-  nodeHeight: 60,
-  horizontalSpacing: 30,
-  verticalSpacing: 100
-};
+//const canvasDiv = document.getElementById("canvas");
 
-const flowChart = new FlowChart(canvasDiv, options);
+//const options = {
+//  nodeWidth: 120,
+//  nodeHeight: 60,
+//  horizontalSpacing: 30,
+//  verticalSpacing: 100
+//};
+
+//const flowChart = new FlowChart(canvasDiv, options);
 
 const jsonTree = {
   name: "Root",
@@ -31,4 +40,4 @@ const jsonTree = {
   ]
 };
 
-flowChart.populateFromJSON(jsonTree);
+//flowChart.populateFromJSON(jsonTree);

@@ -6,10 +6,36 @@
     <!--<link href='engine/flowy.css' rel='stylesheet' type='text/css'>-->
     <link href='main.css' rel='stylesheet' type='text/css'>
     <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <script type="module" src="src/index.js"></script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title></title>
+    <link rel="stylesheet" href="http://localhost:5000/assets/css/normalize.css">
+    <link rel="stylesheet" href="http://localhost:5000/assets/css/main.css">
+    <script async="" src="http://localhost:5000/node_modules/es-module-shims/dist/es-module-shims.js"></script>
+    <script type="importmap">
+{
+  "imports": {
+    "application": "http://localhost:5000/assets/js/application.js",
+    "@hotwired/stimulus": "http://localhost:5000/node_modules/@hotwired/stimulus/dist/stimulus.js",
+    "@hotwired/stimulus-loading": "http://localhost:5000/assets/js/stimulus-loading.js",
+    "controllers": "http://localhost:5000/assets/js/controllers/index.js",
+    "controllers/application": "http://localhost:5000/assets/js/controllers/application.js",
+    "tpf-flowchart": "http://localhost:5000/src/index.js"
+  }
+}
+    </script>
+    <script type="module">
+      import 'application'
+    </script>
   </head>
   <body>
-    <div id="canvas">
+    <div class="tpf-flowchart"
+      data-controller='tpf-flowchart'
+      data-tpf-flowchart-blockData-value='{}'>
+
+      <div class="tpf-flowchart__canvas"
+        data-controller="tpf-canvas"
+        data-tpf-flowchart-target="canvas"></div>
     </div>
   </body>
 </html>
