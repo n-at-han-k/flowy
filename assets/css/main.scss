@@ -36,11 +36,26 @@ body, html {
     }
 
     &__select-panel {
-      //
+      width: 363px;
+      background-color: #FFF;
+      border: 1px solid #E8E8EF;
+      box-sizing: border-box;
+      padding-top: 85px;
+      padding-left: 20px;
+      height: 100%;
+      position: absolute;
+      z-index: 2;
     }
 
     &__prop-panel {
-      //
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 311px;
+      height: 100%;
+      padding-left: 20px;
+      overflow: hidden;
+      z-index: -2;
     }
 
     &__block {
@@ -181,15 +196,6 @@ body, html {
     margin-top: 15px;
 }
 #leftcard {
-    width: 363px;
-    background-color: #FFF;
-    border: 1px solid #E8E8EF;
-    box-sizing: border-box;
-    padding-top: 85px;
-    padding-left: 20px;
-    height: 100%;
-    position: absolute;
-    z-index: 2;
 }
 #search input {
     width: 318px;
@@ -434,14 +440,6 @@ body, html {
     overflow: auto;
 }
 #propwrap {
-    position: absolute;
-    right: 0;
-    top: 0;
-    width: 311px;
-    height: 100%;
-    padding-left: 20px;
-    overflow: hidden;
-    z-index: -2;
 }
 #properties {
     position: absolute;

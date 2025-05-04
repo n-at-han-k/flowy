@@ -28,6 +28,27 @@ body, html {
   z-index: 0;
   overflow: auto;
 }
+.tpf-flowchart__select-panel {
+  width: 363px;
+  background-color: #FFF;
+  border: 1px solid #E8E8EF;
+  box-sizing: border-box;
+  padding-top: 85px;
+  padding-left: 20px;
+  height: 100%;
+  position: absolute;
+  z-index: 2;
+}
+.tpf-flowchart__prop-panel {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 311px;
+  height: 100%;
+  padding-left: 20px;
+  overflow: hidden;
+  z-index: -2;
+}
 .tpf-flowchart__block {
   background-color: #FFF;
   margin-top: 0px !important;
@@ -175,18 +196,6 @@ body, html {
 #buttonsright {
   float: right;
   margin-top: 15px;
-}
-
-#leftcard {
-  width: 363px;
-  background-color: #FFF;
-  border: 1px solid #E8E8EF;
-  box-sizing: border-box;
-  padding-top: 85px;
-  padding-left: 20px;
-  height: 100%;
-  position: absolute;
-  z-index: 2;
 }
 
 #search input {
@@ -465,17 +474,6 @@ body, html {
   left: 361px;
   z-index: 0;
   overflow: auto;
-}
-
-#propwrap {
-  position: absolute;
-  right: 0;
-  top: 0;
-  width: 311px;
-  height: 100%;
-  padding-left: 20px;
-  overflow: hidden;
-  z-index: -2;
 }
 
 #properties {

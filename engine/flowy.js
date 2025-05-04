@@ -1,6 +1,3 @@
-import Block from './block.js';
-import Canvas from './canvas.js';
-
 var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spacing_y) {
     // Initialize default callback functions
     if (!grab) grab = function() {};
@@ -101,10 +98,13 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
          * It clones the block being dragged, sets its initial position, and activates the drag state.
          */
         flowy.beginDrag = function(event) {
+            // 1. Setup canvas position references
             if (window.getComputedStyle(canvas_div).position == "absolute" || window.getComputedStyle(canvas_div).position == "fixed") {
                 absx = canvas_div.getBoundingClientRect().left;
                 absy = canvas_div.getBoundingClientRect().top;
             }
+            
+            // 2. Capture initial mouse/touch coordinates
             if (event.targetTouches) {
                 mouse_x = event.changedTouches[0].clientX;
                 mouse_y = event.changedTouches[0].clientY;
@@ -112,26 +112,47 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
                 mouse_x = event.clientX;
                 mouse_y = event.clientY;
             }
+            
+            // 3. Check if the user is dragging a valid block (not right-click and has create-flowy class)
             if (event.which != 3 && event.target.closest(".create-flowy")) {
+                // 4. Store the original element and clone it
                 original = event.target.closest(".create-flowy");
                 var newNode = event.target.closest(".create-flowy").cloneNode(true);
+                
+                // 5. Add visual feedback to original element
                 event.target.closest(".create-flowy").classList.add("dragnow");
+                
+                // 6. Setup the cloned node with proper classes
                 newNode.classList.add("block");
                 newNode.classList.remove("create-flowy");
+                
+                // 7. Add a unique ID to the block
                 if (blocks.length === 0) {
+                    // If this is the first block, ID = 0
                     newNode.innerHTML += "<input type='hidden' name='blockid' class='blockid' value='" + blocks.length + "'>";
                     document.body.appendChild(newNode);
                     drag = document.querySelector(".blockid[value='" + blocks.length + "']").parentNode;
                 } else {
+                    // If blocks already exist, ID = max ID + 1
                     newNode.innerHTML += "<input type='hidden' name='blockid' class='blockid' value='" + (Math.max.apply(Math, blocks.map(a => a.id)) + 1) + "'>";
                     document.body.appendChild(newNode);
                     drag = document.querySelector(".blockid[value='" + (parseInt(Math.max.apply(Math, blocks.map(a => a.id))) + 1) + "']").parentNode;
                 }
+                
+                // 8. Trigger the grab callback to notify external code
                 blockGrabbed(event.target.closest(".create-flowy"));
+                
+                // 9. Add visual feedback for dragging
                 drag.classList.add("dragging");
+                
+                // 10. Set active flag to indicate dragging is in progress
                 active = true;
+                
+                // 11. Calculate drag offsets (where the user clicked within the block)
                 dragx = mouse_x - (event.target.closest(".create-flowy").getBoundingClientRect().left);
                 dragy = mouse_y - (event.target.closest(".create-flowy").getBoundingClientRect().top);
+                
+                // 12. Position the dragged element at the cursor location, accounting for the offset
                 drag.style.left = mouse_x - dragx + "px";
                 drag.style.top = mouse_y - dragy + "px";
             }
@@ -233,22 +254,41 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
          * It updates the position of the dragged block and checks for valid attachment points.
          */
         flowy.moveBlock = function(event) {
+            // Check if event comes from touch device or mouse and get appropriate coordinates
             if (event.targetTouches) {
+                // For touch devices: get coordinates from the first touch point
                 mouse_x = event.targetTouches[0].clientX;
                 mouse_y = event.targetTouches[0].clientY;
             } else {
+                // For mouse devices: get coordinates directly from the mouse position
                 mouse_x = event.clientX;
                 mouse_y = event.clientY;
             }
+            
+            // This conditional handles the initial setup when an existing block starts being dragged
+            // dragblock is set to true in touchblock() when a user clicks on an existing block
             if (dragblock) {
+                // Set rearrange flag to indicate we're moving an existing block (not creating a new one)
                 rearrange = true;
+                
+                // Add visual feedback by adding the dragging class to the element
                 drag.classList.add("dragging");
+                
+                // Get the unique ID of the dragged block
                 var blockid = parseInt(drag.querySelector(".blockid").value);
+                
+                // Store the parent ID of the dragged block for potential snap-back operation
                 prevblock = blocks.filter(a => a.id == blockid)[0].parent;
+                
+                // Save the dragged block's data to temporary storage (blockstemp)
                 blockstemp.push(blocks.filter(a => a.id == blockid)[0]);
+                
+                // Remove the dragged block from the main blocks array
                 blocks = blocks.filter(function(e) {
                     return e.id != blockid
                 });
+                
+                // If this is not the root block (id != 0), remove its connecting arrow
                 if (blockid != 0) {
                     document.querySelector(".arrowid[value='" + blockid + "']").parentNode.remove();
                 }
@@ -296,36 +336,78 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
                 }
                 dragblock = false;
             }
+            
+            // This conditional handles the active dragging of a new block from the palette
             if (active) {
+                // Update the block's position relative to the mouse position
                 drag.style.left = mouse_x - dragx + "px";
                 drag.style.top = mouse_y - dragy + "px";
-            } else if (rearrange) {
+            } 
+            // This conditional handles the dragging of an existing block (rearranging)
+            else if (rearrange) {
+                // Update the block's position relative to the canvas, accounting for scrolling
                 drag.style.left = mouse_x - dragx - (window.scrollX + absx) + canvas_div.scrollLeft + "px";
                 drag.style.top = mouse_y - dragy - (window.scrollY + absy) + canvas_div.scrollTop + "px";
-                blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value)).x = (drag.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft;
-                blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value)).y = (drag.getBoundingClientRect().top + window.scrollY) + (parseInt(window.getComputedStyle(drag).height) / 2) + canvas_div.scrollTop;
+                
+                // Update the coordinates in the temporary blocks array
+                blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value)).x = 
+                    (drag.getBoundingClientRect().left + window.scrollX) + 
+                    (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft;
+                
+                blockstemp.filter(a => a.id == parseInt(drag.querySelector(".blockid").value)).y = 
+                    (drag.getBoundingClientRect().top + window.scrollY) + 
+                    (parseInt(window.getComputedStyle(drag).height) / 2) + canvas_div.scrollTop;
             }
+            
+            // This conditional runs when dragging is active (either new block or rearranging)
             if (active || rearrange) {
-                if (mouse_x > canvas_div.getBoundingClientRect().width + canvas_div.getBoundingClientRect().left - 10 && mouse_x < canvas_div.getBoundingClientRect().width + canvas_div.getBoundingClientRect().left + 10) {
-                    canvas_div.scrollLeft += 10;
-                } else if (mouse_x < canvas_div.getBoundingClientRect().left + 10 && mouse_x > canvas_div.getBoundingClientRect().left - 10) {
-                    canvas_div.scrollLeft -= 10;
-                } else if (mouse_y > canvas_div.getBoundingClientRect().height + canvas_div.getBoundingClientRect().top - 10 && mouse_y < canvas_div.getBoundingClientRect().height + canvas_div.getBoundingClientRect().top + 10) {
-                    canvas_div.scrollTop += 10;
-                } else if (mouse_y < canvas_div.getBoundingClientRect().top + 10 && mouse_y > canvas_div.getBoundingClientRect().top - 10) {
-                    canvas_div.scrollLeft -= 10;
+                // This group of conditionals handles auto-scrolling when dragging near canvas edges
+                
+                // Auto-scroll right when dragging near the right edge of the canvas
+                if (mouse_x > canvas_div.getBoundingClientRect().width + canvas_div.getBoundingClientRect().left - 10 && 
+                    mouse_x < canvas_div.getBoundingClientRect().width + canvas_div.getBoundingClientRect().left + 10) {
+                    canvas_div.scrollLeft += 10; // Scroll right
+                } 
+                // Auto-scroll left when dragging near the left edge of the canvas
+                else if (mouse_x < canvas_div.getBoundingClientRect().left + 10 && 
+                         mouse_x > canvas_div.getBoundingClientRect().left - 10) {
+                    canvas_div.scrollLeft -= 10; // Scroll left
+                } 
+                // Auto-scroll down when dragging near the bottom edge of the canvas
+                else if (mouse_y > canvas_div.getBoundingClientRect().height + canvas_div.getBoundingClientRect().top - 10 && 
+                         mouse_y < canvas_div.getBoundingClientRect().height + canvas_div.getBoundingClientRect().top + 10) {
+                    canvas_div.scrollTop += 10; // Scroll down
+                } 
+                // Auto-scroll up when dragging near the top edge of the canvas
+                else if (mouse_y < canvas_div.getBoundingClientRect().top + 10 && 
+                         mouse_y > canvas_div.getBoundingClientRect().top - 10) {
+                    canvas_div.scrollLeft -= 10; // Scroll up (should be scrollTop -= 10, this appears to be a bug)
                 }
-                var xpos = (drag.getBoundingClientRect().left + window.scrollX) + (parseInt(window.getComputedStyle(drag).width) / 2) + canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left;
-                var ypos = (drag.getBoundingClientRect().top + window.scrollY) + canvas_div.scrollTop - canvas_div.getBoundingClientRect().top;
+                
+                // Calculate the current position of the dragged block relative to the canvas
+                var xpos = (drag.getBoundingClientRect().left + window.scrollX) + 
+                           (parseInt(window.getComputedStyle(drag).width) / 2) + 
+                           canvas_div.scrollLeft - canvas_div.getBoundingClientRect().left;
+                           
+                var ypos = (drag.getBoundingClientRect().top + window.scrollY) + 
+                           canvas_div.scrollTop - canvas_div.getBoundingClientRect().top;
+                
+                // Get all block IDs for iteration
                 var blockIds = blocks.map(a => a.id);
+                
+                // Loop through all blocks to check for potential attachment points
                 for (var i = 0; i < blocks.length; i++) {
+                    // If the dragged block can attach to this block, show the attachment indicator
                     if (checkAttach(blockIds[i])) {
+                        // Move the indicator to the potential attachment point
                         document.querySelector(".blockid[value='" + blockIds[i] + "']").parentNode.appendChild(document.querySelector(".indicator"));
                         document.querySelector(".indicator").style.left = (document.querySelector(".blockid[value='" + blockIds[i] + "']").parentNode.offsetWidth / 2) - 5 + "px";
                         document.querySelector(".indicator").style.top = document.querySelector(".blockid[value='" + blockIds[i] + "']").parentNode.offsetHeight + "px";
                         document.querySelector(".indicator").classList.remove("invisible");
                         break;
-                    } else if (i == blocks.length - 1) {
+                    } 
+                    // If this is the last block and no attachment point was found, hide the indicator
+                    else if (i == blocks.length - 1) {
                         if (!document.querySelector(".indicator").classList.contains("invisible")) {
                             document.querySelector(".indicator").classList.add("invisible");
                         }
@@ -788,7 +870,6 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
         document.addEventListener("mousedown", touchblock, false);
         document.addEventListener("touchstart", flowy.beginDrag);
         document.addEventListener("touchstart", touchblock, false);
-        
 
         document.addEventListener("mouseup", touchblock, false);
         document.addEventListener("mousemove", flowy.moveBlock, false);

@@ -3,6 +3,7 @@ import FlowChartController from "./FlowChartController.js"
 import CanvasController from "./CanvasController.js"
 import SelectPanelController from "./SelectPanelController.js"
 import PropPanelController from "./PropPanelController.js"
+import SelectBlockController from "./SelectBlockController.js"
 import BlockController from "./BlockController.js"
 
 export {
@@ -10,6 +11,7 @@ export {
   CanvasController,
   PropPanelController,
   SelectPanelController,
+  SelectBlockController,
   BlockController,
 }
 

@@ -5,5 +5,6 @@ export default class CanvasController extends Controller {
   static values = {}
 
   connect() {
+    this.element.controller = this
   }
 }
