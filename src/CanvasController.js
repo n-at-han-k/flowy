@@ -7,4 +7,12 @@ export default class CanvasController extends Controller {
   connect() {
     this.element.controller = this
   }
+
+  get x() {
+    return this.element.getBoundingClientRect().left
+  }
+
+  get y() {
+    return this.element.getBoundingClientRect().top
+  }
 }

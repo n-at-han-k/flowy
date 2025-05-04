@@ -14,7 +14,7 @@ import {
 application.register('tpf-flowchart', FlowChartController)
 application.register('tpf-canvas', CanvasController)
 application.register('tpf-select-panel', SelectPanelController)
-application.register('tpf-select-block', BlockController)
+application.register('tpf-select-block', SelectBlockController)
 application.register('tpf-block', BlockController)
 application.register('tpf-prop-panel', PropPanelController)
 

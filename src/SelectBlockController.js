@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 const FLOWCHART_CONTROLLER_NAME = 'tpf-flowchart'
 const CANVAS_CONTROLLER_NAME = 'tpf-canvas'
 
-export default class BlockController extends Controller {
+export default class SelectBlockController extends Controller {
   static targets = []
   static values = {}
 
@@ -12,7 +12,7 @@ export default class BlockController extends Controller {
     this.endDrag = this.endDrag.bind(this)
     this.onMove = this.onMove.bind(this)
 
-    this.element.addEventListener('mousedown', this.startDrag)
+    this.element.addEventListener('dragstart', this.startDrag)
     window.addEventListener('mouseup', this.endDrag)
   }
 
@@ -30,17 +30,22 @@ export default class BlockController extends Controller {
     return element.controller
   }
 
-  startDrag() {
+  startDrag(e) {
     window.addEventListener('mousemove', this.onMove)
+    e.dataTransfer.setData(
+      "application/drag-key",
+      'godknowswhat'
+    )
+    e.dataTransfer.effectAllowed = "move"
     console.log('start')
   }
 
   onMove() {
-    console.log('move')
+    //console.log('move')
   }
 
   endDrag() {
     window.removeEventListener('mousemove', this.onMove)
-    console.log('end')
+    //console.log('end')
   }
 }
