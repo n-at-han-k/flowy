@@ -1,46 +1,28 @@
 import { Controller } from "@hotwired/stimulus"
+import BlockBaseController from './BlockBaseController.js'
 
-const FLOWCHART_CONTROLLER_NAME = 'tpf-flowchart'
-const CANVAS_CONTROLLER_NAME = 'tpf-canvas'
-
-export default class BlockController extends Controller {
+export default class BlockController extends BlockBaseController {
   static targets = []
   static values = {}
 
   connect() {
-    this.startDrag = this.startDrag.bind(this)
-    this.endDrag = this.endDrag.bind(this)
-    this.onMove = this.onMove.bind(this)
-
-    this.element.addEventListener('mousedown', this.startDrag)
-    window.addEventListener('mouseup', this.endDrag)
+    super.connect()
   }
 
-  disconnect() {
-    window.removeEventListener('mousemove', this.onMove)
-    window.removeEventListener('mouseup', this.endDrag)
-  }
-
-  get canvas() {
-    let element = this.element.closest(
-      `[data-controller~=${FLOWCHART_CONTROLLER_NAME}]`
-    ).querySelector(
-      `[data-controller~=${CANVAS_CONTROLLER_NAME}]`
+  startDrag(e) {
+    super.startDrag(e)
+    e.dataTransfer.setData(
+      "application/drag-key",
+      'somesortofuuid'
     )
-    return element.controller
+    e.dataTransfer.effectAllowed = "move"
   }
 
-  startDrag() {
-    window.addEventListener('mousemove', this.onMove)
-    console.log('start')
+  onDrag(e) {
+    super.onDrag(e)
   }
 
-  onMove() {
-    console.log('move')
-  }
-
-  endDrag() {
-    window.removeEventListener('mousemove', this.onMove)
-    console.log('end')
+  endDrag(e) {
+    super.endDrag(e)
   }
 }
