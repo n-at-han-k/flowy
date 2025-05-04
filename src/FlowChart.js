@@ -30,18 +30,18 @@ export default class FlowChart {
     const nodeWidth = this.options.nodeWidth || 120;
     const horizontalSpacing = this.options.horizontalSpacing || 30;
 
-    if (!node.children || node.children.length === 0) {
+    if (!node.child || node.child.length === 0) {
       // Leaf node: Assign its position and return its width
       const width = nodeWidth;
       this.nodePositions.set(node, { x: xOffset, y: level });
       return width;
     }
 
-    // Internal node: Calculate positions for children first
+    // Internal node: Calculate positions for child first
     let totalWidth = 0;
     const childXOffsets = [];
 
-    node.children.forEach((child, index) => {
+    node.child.forEach((child, index) => {
       const childXOffset = xOffset + totalWidth;
       childXOffsets.push(childXOffset);
 
@@ -53,7 +53,7 @@ export default class FlowChart {
     // Remove extra spacing after the last child
     totalWidth -= horizontalSpacing;
 
-    // Center the parent node above its children
+    // Center the parent node above its child
     const parentX = xOffset + totalWidth / 2 - nodeWidth / 2;
     this.nodePositions.set(node, { x: parentX, y: level });
 
@@ -71,9 +71,9 @@ export default class FlowChart {
       const nodeElement = this.createNode(currentNode, x, y);
       this.canvas.appendChild(nodeElement);
 
-      // Add children to the queue
-      if (currentNode.children && Array.isArray(currentNode.children)) {
-        queue.push(...currentNode.children);
+      // Add child to the queue
+      if (currentNode.child && Array.isArray(currentNode.child)) {
+        queue.push(...currentNode.child);
       }
     }
   }

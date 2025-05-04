@@ -13,19 +13,19 @@ const flowChart = new FlowChart(canvasDiv, options);
 
 const jsonTree = {
   name: "Root",
-  children: [
+  child: [
     {
       name: "Child 1",
-      children: [
+      child: [
         { name: "Grandchild 1" },
         { name: "Grandchild 2" }
       ]
     },
     {
       name: "Child 2",
-      children: [
+      child: [
         { name: "Grandchild 3" },
-        { name: "Grandchild 4", children: [{ name: "Great-Grandchild 1" }] }
+        { name: "Grandchild 4", child: [{ name: "Great-Grandchild 1" }] }
       ]
     }
   ]
