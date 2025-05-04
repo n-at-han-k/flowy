@@ -1,13 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class FlowChartController extends Controller {
-  static targets = [
-    'canvas'
-  ]
-
-  static values = {
-    blockData: Object
-  }
+  static targets = ['canvas', 'panel']
+  static values = {blockData: Object}
 
   connect() {
     this.blockDataValue = testData()

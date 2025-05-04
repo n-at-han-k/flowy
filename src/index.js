@@ -1,11 +1,15 @@
 //import FlowChart from "./FlowChart.js"
 import FlowChartController from "./FlowChartController.js"
 import CanvasController from "./CanvasController.js"
+import SelectPanelController from "./SelectPanelController.js"
+import PropPanelController from "./PropPanelController.js"
 import BlockController from "./BlockController.js"
 
 export {
   FlowChartController,
   CanvasController,
+  PropPanelController,
+  SelectPanelController,
   BlockController,
 }
 

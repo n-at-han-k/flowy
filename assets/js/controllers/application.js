@@ -5,11 +5,15 @@ const application = Application.start()
 import {
   FlowChartController,
   CanvasController,
+  PropPanelController,
+  SelectPanelController,
   BlockController,
 } from 'tpf-flowchart'
 
 application.register('tpf-flowchart', FlowChartController)
 application.register('tpf-canvas', CanvasController)
+application.register('tpf-select-panel', SelectPanelController)
+application.register('tpf-prop-panel', PropPanelController)
 application.register('tpf-block', BlockController)
 
 application.debug = true
