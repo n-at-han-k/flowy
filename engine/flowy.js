@@ -21,20 +21,7 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
     if (!spacing_y) {
         spacing_y = 80;
     }
-    if (!Element.prototype.matches) {
-        Element.prototype.matches = Element.prototype.msMatchesSelector ||
-            Element.prototype.webkitMatchesSelector;
-    }
-    if (!Element.prototype.closest) {
-        Element.prototype.closest = function(s) {
-            var el = this;
-            do {
-                if (Element.prototype.matches.call(el, s)) return el;
-                el = el.parentElement || el.parentNode;
-            } while (el !== null && el.nodeType === 1);
-            return null;
-        };
-    }
+
     var loaded = false;
     flowy.load = function() {
         if (!loaded)
@@ -533,16 +520,26 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
         }
 
         function checkOffset() {
+            // Map the x-coordinates of all blocks
             offsetleft = blocks.map(a => a.x);
+
+            // Map the widths of all blocks
             var widths = blocks.map(a => a.width);
+
+            // Calculate the leftmost position of all blocks (adjusted for their widths)
             var mathmin = offsetleft.map(function(item, index) {
                 return item - (widths[index] / 2);
-            })
+            });
             offsetleft = Math.min.apply(Math, mathmin);
+
+            // Edge Case: If the leftmost block is outside the canvas, adjust all blocks
             if (offsetleft < (canvas_div.getBoundingClientRect().left + window.scrollX - absx)) {
-                var blocko = blocks.map(a => a.id);
+                var blocko = blocks.map(a => a.id); // Map all block IDs
                 for (var w = 0; w < blocks.length; w++) {
+                    // Adjust the left position of each block
                     document.querySelector(".blockid[value='" + blocks.filter(a => a.id == blocko[w])[0].id + "']").parentNode.style.left = blocks.filter(a => a.id == blocko[w])[0].x - (blocks.filter(a => a.id == blocko[w])[0].width / 2) - offsetleft + canvas_div.getBoundingClientRect().left - absx + 20 + "px";
+
+                    // Adjust the position of arrows if the block has a parent
                     if (blocks.filter(a => a.id == blocko[w])[0].parent != -1) {
                         var arrowblock = blocks.filter(a => a.id == blocko[w])[0];
                         var arrowx = arrowblock.x - blocks.filter(a => a.id == blocks.filter(a => a.id == blocko[w])[0].parent)[0].x;
@@ -553,6 +550,8 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
                         }
                     }
                 }
+
+                // Update the x-coordinates of all blocks
                 for (var w = 0; w < blocks.length; w++) {
                     blocks[w].x = (document.querySelector(".blockid[value='" + blocks[w].id + "']").parentNode.getBoundingClientRect().left + window.scrollX) + (canvas_div.scrollLeft) + (parseInt(window.getComputedStyle(document.querySelector(".blockid[value='" + blocks[w].id + "']").parentNode).width) / 2) - 20 - canvas_div.getBoundingClientRect().left;
                 }
@@ -560,42 +559,62 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
         }
 
         function rearrangeMe() {
+            // Map each block's parent ID to create a list of parent-child relationships
             var result = blocks.map(a => a.parent);
+
+            // Iterate through each parent block
             for (var z = 0; z < result.length; z++) {
+                // Skip the root block (parent ID -1)
                 if (result[z] == -1) {
                     z++;
                 }
-                var totalwidth = 0;
-                var totalremove = 0;
-                var maxheight = 0;
+
+                // Initialize variables to calculate total width and alignment
+                var totalwidth = 0; // Total width of all child blocks
+                var totalremove = 0; // Tracks the cumulative width removed for alignment
+                var maxheight = 0; // Tracks the maximum height of child blocks (not used here but could be extended)
+
+                // Iterate through all child blocks of the current parent
                 for (var w = 0; w < blocks.filter(id => id.parent == result[z]).length; w++) {
                     var children = blocks.filter(id => id.parent == result[z])[w];
+
+                    // If the child block has no children, set its child width to 0
                     if (blocks.filter(id => id.parent == children.id).length == 0) {
                         children.childwidth = 0;
                     }
+
+                    // Calculate the total width of the child block, including padding
                     if (children.childwidth > children.width) {
                         if (w == blocks.filter(id => id.parent == result[z]).length - 1) {
-                            totalwidth += children.childwidth;
+                            totalwidth += children.childwidth; // Add child width for the last block
                         } else {
-                            totalwidth += children.childwidth + paddingx;
+                            totalwidth += children.childwidth + paddingx; // Add child width + padding
                         }
                     } else {
                         if (w == blocks.filter(id => id.parent == result[z]).length - 1) {
-                            totalwidth += children.width;
+                            totalwidth += children.width; // Add block width for the last block
                         } else {
-                            totalwidth += children.width + paddingx;
+                            totalwidth += children.width + paddingx; // Add block width + padding
                         }
                     }
                 }
+
+                // Update the parent block's child width
                 if (result[z] != -1) {
                     blocks.filter(a => a.id == result[z])[0].childwidth = totalwidth;
                 }
+
+                // Align child blocks under the parent block
                 for (var w = 0; w < blocks.filter(id => id.parent == result[z]).length; w++) {
                     var children = blocks.filter(id => id.parent == result[z])[w];
                     const r_block = document.querySelector(".blockid[value='" + children.id + "']").parentNode;
                     const r_array = blocks.filter(id => id.id == result[z]);
+
+                    // Set the top position of the child block relative to the parent
                     r_block.style.top = r_array.y + paddingy + canvas_div.getBoundingClientRect().top - absy + "px";
                     r_array.y = r_array.y + paddingy;
+
+                    // Set the left position of the child block based on its width and alignment
                     if (children.childwidth > children.width) {
                         r_block.style.left = r_array[0].x - (totalwidth / 2) + totalremove + (children.childwidth / 2) - (children.width / 2) - (absx + window.scrollX) + canvas_div.getBoundingClientRect().left + "px";
                         children.x = r_array[0].x - (totalwidth / 2) + totalremove + (children.childwidth / 2);
@@ -606,6 +625,7 @@ var flowy = function(canvas, grab, release, snapping, rearrange, spacing_x, spac
                         totalremove += children.width + paddingx;
                     }
 
+                    // Update the arrow connecting the child block to its parent
                     var arrowblock = blocks.filter(a => a.id == children.id)[0];
                     var arrowx = arrowblock.x - blocks.filter(a => a.id == children.parent)[0].x + 20;
                     var arrowy = paddingy;
